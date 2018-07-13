@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript">
+//정규표현식
+
+window.onload = function(){
+//	var check = /^.$/;//임의의 한글자로 이뤄진 패턴
+// 	alert(check.test('d'));//true
+// 	alert(check.test('dd'));//false
+	
+	//소문자로된 한글자 패턴
+// 	var check = /^[a-z]$/;
+	//alert(check.test('d'));
+	//소문자로된 두글자 패턴
+// 	var check = /^[a-z]{2}$/;
+// 	alert(check.test('da'));
+	
+	//대문자 세글자 이후에 숫자 5글자로 이뤄진 패턴검사
+// 	var cc =/^[A-Z]{3}[0-9]{5}$/;
+// 	alert(cc.test('ABC12345'));
+
+//전화번호 -하이픈
+//  var ccc = /^(\d{3})-(\d{3,4})-(\d{4})$/;
+//  alert(ccc.test('010-2551-5401'));
+ 
+ //전체 문자열중에 a가 들어가 있을것
+//  var cccc = /a/
+//  var cccc = /(?=a)/
+// 	 alert(cccc.test('afsdff'));
+ 
+ 
+	 var pattern1 = /[0-9]/; // 숫자만 입력
+	 var pattern2 = /[a-zA-Z]/; // 문자만 입력
+	 var pattern3 = /[~!@#$%^&*()_+|<>?:{}]/; // 특수문자 입력
+	 var pattern4 = /[0-9a-zA-Z.;\-]{}/;
+	    
+	 var check = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$/;
+	 var checkTeacher =/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[-!@#$%^&*]).{8,}/;
+	 alert(checkTeacher.test('aS!12345'));
+	//문자+숫자+특가능한 정규식 글자 여덟자리
+// 	alert(check.test('aS!12345'));
+// 	if(pattern4.test('aS!12345').length>=8)
+// 	alert('true');
+// 	else
+// 	alert('false');
+}
+
+
+
+
+</script>
+<title>Insert title here</title>
+</head>
+<body>
+
+</body>
+</html>
