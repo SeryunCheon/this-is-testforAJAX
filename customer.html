@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AJAX TEST 세륜</title>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+	integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+	crossorigin="anonymous"></script>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		
+		list();
+			var pattern1 = /[0-9]/;	
+			// 숫자 
+			var pattern2 = /[a-zA-Z]/;	
+			// 문자 
+			var pattern3 = /[~!@#$%^&*()_+|<>?:{}]/;
+			var pattern4 =/[--]/;
+			var blank_pattern1 = /^\s+|\s+$/g;
+			
+			
+	$('.thingCheck').blur(function(){		
+// if($('#id').val() == "") {  
+// 		$('#CheckCheck').html("아이디는 빈칸이 불가합니다.");
+// 		$('#id').focus();
+// 		  }	
+		if($('#name').val() == "") {
+	  		$('#CheckCheck').html("이름은 빈칸이 불가합니다.");
+    		$('#name').focus();	
+  		}
+ 		else if( $('#age').val() == "" || !pattern1.test($('#age').val()) ) {
+	  		$('#CheckCheck').html("age는 공백이불가하며 숫자만 가능합니다. 다시입력해주세요"); 
+	    	$('#age').focus();
+	 		 }
+		 else if($('#tel').val() == "") {
+	 		$('#CheckCheck').html("tel은 공백이 불가합니다. 다시입력해주세요"); 
+	    	$('#tel').focus();	
+	  		}
+ 		else if(!pattern1.test($('#tel').val()) || !pattern4.test($('#tel').val()) || pattern2.test($('#tel').val()) || pattern3.test($('#tel').val()) || $('#tel').val().length >14 || $('#tel').val().length<11) {
+	  		$('#CheckCheck').html("연락처는 11~12자리의 숫자만 가능합니다. 연락처를 알맞은 형식으로 기입해주세요. ex)010-1234-5678"); 
+	  		$('#tel').focus();
+	  		}		  
+ 		else if($('#addr').val() == "") {
+	 		$('#CheckCheck').html("주소 공백이 불가합니다. 다시입력해주세요"); 
+	    	$('#addr').focus();		
+	  		}	  		  		  
+	})		
+
+	
+	
+	 $('#id').blur(function(){
+
+		      var userID = $('#id').val();
+		if($('#id').val() == "") {  
+				  $('#isDupli').html("아이디는 빈칸이 불가합니다.");
+			    $('#id').focus();
+			  }
+			  
+		else{
+	        $.ajax({
+	            type : 'POST',
+	            url : 'idCheck.do',
+	            data : {
+	                userID : userID
+	            },
+	            success : function(result) {
+	                if (result==1) {
+	                	//해당아이디가 없는거임
+	                    $('#isDupli').html("you can use this ID/아이디 사용가능");
+	                } else {
+	                    $('#isDupli').html("you can not use this ID/아이디 사용불가");	                    
+	                    $('#id').focus();		                }
+	            }
+	            
+	        });
+	 }//else끝
+	 });
+		
+   function list(){
+	$.ajax({
+		url : "List.do", 
+		dataType : "json", 
+		cache : false, 
+		success : function(data, textStatus, xhr) {
+// 			$('#listTable tr:not(eq(1))').remove();
+			$('#listTable tr:not(:first)').remove();
+			$('#listTable tr:eq(1)').append("<tr>")
+			$.each(data,function(index, data) { // 이치를 써서 모든 데이터들을 배열에 넣음
+				var items = [];
+				var deleteBtn = "<button type='button' id='deleteBtn' value='" +data.id+"' style='color: white;  background-color: #D5C2EE; border: 1px solid #F0FFF0;'>삭제</button>";
+				items.push("<td>" + data.no + "</td>"); 	// 여기에 id pw addr tel의 값을 배열에 넣은뒤
+				items.push("<td>" + data.id + "</td>"); 	// 여기에 id pw addr tel의 값을 배열에 넣은뒤
+				items.push("<td>" + data.name + "</td>"); // 여기에 id pw addr tel의 값을 배열에 넣은뒤
+				items.push("<td>" + data.age + "</td>"); // 여기에 id pw addr tel의 값을 배열에 넣은뒤
+				items.push("<td>" + data.tel + "</td>");
+				items.push("<td>" + data.addr + "</td>");
+				items.push("<td>" + deleteBtn + "</td>");	
+				$("<tr/>", {html : items}).appendTo('#listTable'); // 그리고 그 tr을 테이블에 붙임
+			});//each끝								
+		},
+		
+    error:function(xhrReq, status, error){
+        alert("ajax통신 실패!!!");
+			alert(status);
+			alert(error);	    	
+    }
+	});	
+};
+
+//삭제 버튼 동적 처리 메소드
+$(document).on("click", "#deleteBtn", function(){
+    var id = $(this).val();
+       alert(id);
+	$.ajax({
+	type : 'get',
+	url : 'Delete.do',
+	data : {id : id},
+	dataType : 'json',
+	success : function(GjsonDelete) {
+//			location.href=document.location;
+        alert("성공적으로 삭제됐습니다.");
+		list();
+	},
+	error : function(xhr, option, error) {
+        alert("ajax통신 실패!!!아마 빈칸인데 가입하려 하셨을거에요");
+		}
+	})
+});
+
+$('#joinBtn').click(function() {
+		$.ajax ({
+			type : 'get',
+			url : 'join.do',
+			data : { 
+				'id' : $('#id').val(), 'name' : $('#name').val(), 'age' : $('#age').val(),
+				'tel' : $('#tel').val(), 'addr' : $('#addr').val()
+				},
+			dataType : 'json',
+			success : function(result) {
+					 list();
+			},
+			error : function(xhr, option, error) {
+				alert("통신실패")
+			}
+		});
+	});
+
+
+
+	});		
+</script>
+<style type="text/css">
+.a {
+	border: solid red 5px
+}
+body {
+	border: 0;
+	padding: 0;
+
+	min-height: 100%;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: center;
+
+}
+span {
+	width: 150px;
+	color: #C1AEEE;
+}
+
+input {
+	border: solid gray 1px
+}
+
+table {
+	width: 100%;
+	background-color: transparent;
+}
+
+th, td {
+	border: 1px gray solid;
+	text-align: center;
+	padding: 3px
+}
+
+h2 {
+	text-align: center
+}
+</style>
+
+</head>
+<body>
+<font color="grey" style="font-family: 나눔고딕; ">
+<!-- font-weight: bold; -->
+	<form name="inForm" method="post" id="inForm" >
+		<table cellspacing="0">
+			<tr bgcolor="#7B68EE" style="color:white;"  >
+				<th>아이디</th>
+				<th>이름</th>
+				<th>나이</th>
+				<th>전화번호</th>
+				<th>주소</th>
+			</tr>
+			<tr>
+				<td style="text-align: left">
+				<input type="text" size="8" name="id" id="id" >
+				<span id="isDupli">중복결과여부</span></td>
+				<td><input type="text" size="8" name="name" id="name" class="thingCheck"></td>
+				<td><input type="text" size="4" name="age" id="age" class="thingCheck"></td>
+				<td><input type="text" size="12" name="tel" id="tel" class="thingCheck"></td>
+				<td><input type="text" size="30" name="addr" id="addr" class="thingCheck"></td>
+			</tr>
+			<tr>
+				<td colspan="5" align="center">
+				<input type="button" id="joinBtn" value="가입하기" style="color: white;  background-color: #D5C2EE; border: 1px solid #F0FFF0;">
+				<span id="CheckCheck"></span>
+				</td>
+	
+			</tr>
+		</table>
+	</form>
+	<br>
+	<hr color="#B4C3FF">
+
+	<h2>고객 리스트 !</h2>
+	<table id="listTable" cellspacing="0">
+		<tr bgcolor="#7B68EE" style="color:white;"  >
+			<th>번호</th>
+			<th>아이디</th>
+			<th>이름</th>
+			<th>나이</th>
+			<th>전화번호</th>
+			<th>주소</th>
+			<th>삭제</th>
+		</tr>
+		</table>
+	</font>
+</body>
+</html>
